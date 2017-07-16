@@ -1,0 +1,22 @@
+@(form: Form[models.RbsBots])(implicit messages: Messages)
+
+@main("Welcome RPS Bot") {
+
+        <div class="row">
+            <div class="page-header">
+                <h1>RPS Bots</h1>
+            </div>
+
+        </div>
+     <div class="row">
+
+      @helper.form(action = routes.HomeController.submit, 'enctype -> "multipart/form-data") {
+        @helper.inputText(form("opponentName"),'_label -> "Enter your Name")
+        @helper.inputText(form("pointsToWin"),'_label -> "Enter your pointsToWin")
+        @helper.inputText(form("maxRounds"),'_label -> "Enter your maxRounds")
+        @helper.inputText(form("dynamiteCount"), '_label -> "Enter dynamiteCount")
+        <input class="btn btn-primary btn-lg" type="submit" value="Submit"/>
+        }
+
+       </div>
+}

@@ -1,0 +1,122 @@
+@(opponentName: String, pointsToWin: Int, maxRounds:Int, dynamiteCount:Int)(implicit messages: Messages)
+
+@main("Welcome RPS Bot") {
+
+        <div class="row">
+            <div class="page-header">
+                <h1>RPS Bots Information</h1>
+            </div>
+
+        </div>
+
+@helper.form(action = routes.HomeController.submit, 'enctype -> "multipart/form-data" ) {
+
+    <div class="row">
+        <ul class="list-group">
+             <li class="list-group-item">
+                 <span class="badge">@pointsToWin</span>
+                 pointsToWin
+             </li>
+             <li class="list-group-item">
+                 <span class="badge">@maxRounds</span>
+                 maxRounds
+             </li>
+             <li class="list-group-item">
+                 <span class="badge">@dynamiteCount</span>
+                 dynamiteCount
+             </li>
+
+         </ul>
+     </div>
+
+     <div class="row">
+             <div id="tabledata">
+                 <table class="table table-striped table-bordered" id='providersFormElementsTable'>
+                     <thead>
+                     <tr>
+                         <th>@opponentName</th>
+                         <th>System</th>
+                         <th>Result</th>
+                     </tr>
+                     </thead>
+                     <tbody id="tablebody"></tbody>
+                 </table>
+             </div>
+     </div>
+
+<br>
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="btn-group" data-toggle="buttons radio">
+                    <label class="btn">
+                        <input type="radio" name='rps' value="ROCK"><i class="fa fa-circle-o fa-2x"></i><i class="fa fa-check-circle-o fa-2x"></i><span> ROCK</span>
+                    </label>
+                    <label class="btn">
+                        <input type="radio" name='rps' value="PAPER"><i class="fa fa-circle-o fa-2x"></i><i class="fa fa-check-circle-o fa-2x"></i><span> PAPER</span>
+                    </label>
+                    <label class="btn">
+                        <input type="radio" name='rps' value="SCISSORS"><i class="fa fa-circle-o fa-2x"></i><i class="fa fa-check-circle-o fa-2x"></i><span> SCISSORS</span>
+                    </label>
+                    <label class="btn">
+                        <input type="radio" name='rps' value="DYNAMITE"><i class="fa fa-circle-o fa-2x"></i><i class="fa fa-check-circle-o fa-2x"></i><span> DYNAMITE</span>
+                    </label>
+                    <label class="btn">
+                        <input type="radio" name='rps' value="WATERBOMB"><i class="fa fa-circle-o fa-2x"></i><i class="fa fa-check-circle-o fa-2x"></i><span> WATERBOMB</span>
+                    </label>
+                </div>
+
+
+            </div>
+        </div>
+
+        }
+
+         <script>
+
+         $( document ).ready(function() {
+
+            var successFn = function(data) {
+
+                var successPostFn = function(data1) {
+
+                    var mytable = $('tablebody');
+
+                    var row = $('<tr></tr>')
+                    $('<td></td>').text($('input[name=rps]:checked').val()).appendTo(row);
+                    $('<td></td>').text(data).appendTo(row);
+                    $('<td></td>').text(data1).appendTo(row);
+
+                    row.appendTo("#tablebody");
+
+                    $('input[name="rps"]').prop('checked', false);
+                }
+
+	        var r = jsRoutes.controllers.HomeController.lastOpponentMove();
+
+            $.ajax({url: r.url,
+                    type: r.type,
+                    success: successPostFn,
+                    error: errorFn,
+                    contentType: "application/json",
+                    data: JSON.stringify({"lastOpponentMove" :  $('input[name=rps]:checked').val(), "lastSystemMove" : data})});
+         }
+
+         var errorFn = function(err) {
+            alert("Error of ajax Call" + err.toString);
+         }
+
+         ajax1 = {
+            success: successFn,
+            error: errorFn
+         }
+
+         $("input").click(function(){
+            jsRoutes.controllers.HomeController.move().ajax(ajax1)
+
+         });
+
+         });
+
+        </script>
+}

@@ -1,0 +1,13 @@
+dd.error{
+    border: 5px solid #B10E1E;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    padding: 20px 15px 15px;
+    max-width:inherit;
+
+}
+.container{
+
+max-width:1025px;
+margin: auto :10px;
+}
