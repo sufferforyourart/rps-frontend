@@ -15,17 +15,24 @@
         <ul class="list-group">
              <li class="list-group-item">
                  <span class="badge">@pointsToWin</span>
-                 pointsToWin
+                 Points to win
              </li>
-             <li class="list-group-item">
-                 <span class="badge">@maxRounds</span>
-                 maxRounds
-             </li>
-             <li class="list-group-item">
-                 <span class="badge">@dynamiteCount</span>
-                 dynamiteCount
-             </li>
-
+             <!--<li class="list-group-item">-->
+                 <!--<span class="badge">@maxRounds</span>-->
+                 <!--maxRounds-->
+             <!--</li>-->
+             <!--<li class="list-group-item">-->
+                 <!--<span class="badge">@dynamiteCount</span>-->
+                 <!--dynamiteCount-->
+             <!--</li>-->
+            <li class="list-group-item">
+                 <span class="badge" id="you">0</span><input hidden="true" value="0" id="count"/>
+                @opponentName point
+            </li>
+            <li class="list-group-item">
+                 <span class="badge" id="system">0</span>
+                Systme point
+            </li>
          </ul>
      </div>
 
@@ -90,6 +97,15 @@
                     row.appendTo("#tablebody");
 
                     $('input[name="rps"]').prop('checked', false);
+
+                    $('#tabledata').animate({scrollTop: parseInt($('#tabledata').prop("scrollHeight"))}, 800);
+
+                    $('#count').attr('value',parseInt($('#count').val()) + 1);
+                    var c = parseInt($('#count').val()) ;
+
+                    if(data1=="WIN"){ var a = parseInt($('#you').text()); $('#you').html(a + c); $('#count').attr('value', 0);}
+                    if(data1=="LOST") {var b = parseInt($('#system').text());$('#system').html(b + c); $('#count').attr('value',0);}
+
                 }
 
 	        var r = jsRoutes.controllers.HomeController.lastOpponentMove();
