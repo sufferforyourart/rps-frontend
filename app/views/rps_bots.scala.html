@@ -21,17 +21,17 @@
                  <!--<span class="badge">@maxRounds</span>-->
                  <!--maxRounds-->
              <!--</li>-->
-             <!--<li class="list-group-item">-->
-                 <!--<span class="badge">@dynamiteCount</span>-->
-                 <!--dynamiteCount-->
-             <!--</li>-->
+             <li class="list-group-item">
+                 <span class="badge" id="dynamitecount">@{(pointsToWin*0.1).toInt}</span>
+                 dynamiteCount
+             </li>
             <li class="list-group-item">
                  <span class="badge" id="you">0</span><input hidden="true" value="0" id="count"/>
                 @opponentName point
             </li>
             <li class="list-group-item">
                  <span class="badge" id="system">0</span>
-                Systme point
+                System point
             </li>
          </ul>
      </div>
@@ -55,22 +55,13 @@
 
         <div class="row">
             <div class="col-xs-12">
-                <div class="btn-group" data-toggle="buttons radio">
-                    <label class="btn">
-                        <input type="radio" name='rps' value="ROCK"><i class="fa fa-circle-o fa-2x"></i><i class="fa fa-check-circle-o fa-2x"></i><span> ROCK</span>
-                    </label>
-                    <label class="btn">
-                        <input type="radio" name='rps' value="PAPER"><i class="fa fa-circle-o fa-2x"></i><i class="fa fa-check-circle-o fa-2x"></i><span> PAPER</span>
-                    </label>
-                    <label class="btn">
-                        <input type="radio" name='rps' value="SCISSORS"><i class="fa fa-circle-o fa-2x"></i><i class="fa fa-check-circle-o fa-2x"></i><span> SCISSORS</span>
-                    </label>
-                    <label class="btn">
-                        <input type="radio" name='rps' value="DYNAMITE"><i class="fa fa-circle-o fa-2x"></i><i class="fa fa-check-circle-o fa-2x"></i><span> DYNAMITE</span>
-                    </label>
-                    <label class="btn">
-                        <input type="radio" name='rps' value="WATERBOMB"><i class="fa fa-circle-o fa-2x"></i><i class="fa fa-check-circle-o fa-2x"></i><span> WATERBOMB</span>
-                    </label>
+                <div id="winner" style="display:none; width:100%; text-align:center"></div>
+                <div id="allOptions">
+                        <input type="radio" name='rps' class="radio-image" id="ROCK" value="ROCK"/><!--<i class="fa fa-circle-o fa-2x"></i><i class="fa fa-check-circle-o fa-2x"></i><span> ROCK</span>-->
+                        <input type="radio" name='rps' class="radio-image" id="PAPER" value="PAPER"/><!--<i class="fa fa-circle-o fa-2x"></i><i class="fa fa-check-circle-o fa-2x"></i><span> PAPER</span>-->
+                        <input type="radio" name='rps' class="radio-image" id="SCISSORS" value="SCISSORS"/><!--<i class="fa fa-circle-o fa-2x"></i><i class="fa fa-check-circle-o fa-2x"></i><span> SCISSORS</span>-->
+                        <input type="radio" name='rps' class="radio-image" id="DYNAMITE" value="DYNAMITE"/><!--<i class="fa fa-circle-o fa-2x"></i><i class="fa fa-check-circle-o fa-2x"></i><span> DYNAMITE</span>-->
+                        <input type="radio" name='rps' class="radio-image" id="WATERBOMB" value="WATERBOMB"/><!--<i class="fa fa-circle-o fa-2x"></i><i class="fa fa-check-circle-o fa-2x"></i><span> WATERBOMB</span>-->
                 </div>
 
 
@@ -83,11 +74,10 @@
 
          $( document ).ready(function() {
 
+
             var successFn = function(data) {
 
                 var successPostFn = function(data1) {
-
-                    var mytable = $('tablebody');
 
                     var row = $('<tr></tr>')
                     $('<td></td>').text($('input[name=rps]:checked').val()).appendTo(row);
@@ -106,7 +96,22 @@
                     if(data1=="WIN"){ var a = parseInt($('#you').text()); $('#you').html(a + c); $('#count').attr('value', 0);}
                     if(data1=="LOST") {var b = parseInt($('#system').text());$('#system').html(b + c); $('#count').attr('value',0);}
 
+                    if(parseInt($('#you').text()) >=10 || parseInt($('#system').text()) >=10){
+                        $("#allOptions").hide();
+                        $('#winner').show();
+                        var image = $('<img></img>').attr('src', parseInt($('#you').text()) >=10 ? "http://www.placehold.it/187x60/DAF7A6/C70039&text=You Win" : "http://www.placehold.it/187x60/DAF7A6/C70039&text=You Lost");
+                        image.appendTo('#winner')
+
+                    } else {
+
+                        setTimeout(function(){
+                        jsRoutes.controllers.HomeController.dynamicMove(parseInt($('#dynamitecount').text())).ajax(ajax2)
+                        },1000);
+                    }
                 }
+
+                if($('input[name=rps]:checked').val()=="DYNAMITE"){$("#dynamitecount").html(parseInt($('#dynamitecount').text()) -1);}
+                if(parseInt($('#dynamitecount').text())==0){$('div[id=DYNAMITE]').hide();}
 
 	        var r = jsRoutes.controllers.HomeController.lastOpponentMove();
 
@@ -118,6 +123,10 @@
                     data: JSON.stringify({"lastOpponentMove" :  $('input[name=rps]:checked').val(), "lastSystemMove" : data})});
          }
 
+         function successDynamicFn(dynamicMove) {
+             $('a[id*='+dynamicMove+'').trigger("click");
+         }
+
          var errorFn = function(err) {
             alert("Error of ajax Call" + err.toString);
          }
@@ -127,12 +136,37 @@
             error: errorFn
          }
 
-         $("input").click(function(){
-            jsRoutes.controllers.HomeController.move().ajax(ajax1)
+         ajax2 = {
+            success: successDynamicFn,
+            error: errorFn
+         }
+
+         $('input[type=radio].radio-image').each(function() {
+            var id = this.id;
+            $(this).hide().after('<a  id="newrad_' + id + '" class="newrad" href="#"><div class="radio" id="' + id + '"></div></a>');
+        });
+
+        $("a").click(function(){
+            var $check = $(this).prev('input');
+            $('.newrad div').attr('class', 'radio');
+            $(this).find('div').addClass('checked');
+            $('input[type=radio].radio-image').attr('checked', false);
+            $check.prop('checked', true);
+            jsRoutes.controllers.HomeController.getOpponentMove().ajax(ajax1)
 
          });
 
+         function callme(){
+            jsRoutes.controllers.HomeController.dynamicMove(parseInt($('#dynamitecount').text())).ajax(ajax2)
+         }
+         callme();
+
+
+
+
          });
+
+
 
         </script>
 }

@@ -5,8 +5,9 @@
 GET     /                           controllers.HomeController.index
 POST    /                           controllers.HomeController.submit
 
-GET     /move                       controllers.HomeController.move
+GET     /move                       controllers.HomeController.getOpponentMove
 POST    /move                       controllers.HomeController.lastOpponentMove
+GET     /dynamicMove/:dynaCount     controllers.HomeController.dynamicMove(dynaCount : Int)
 
 
 # Map static resources from the /public folder to the /assets URL path

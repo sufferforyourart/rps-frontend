@@ -37,8 +37,6 @@ import scala.util.{Failure, Success, Try}
 @Singleton
 class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: MessagesApi, context: ExecutionContext) extends Controller with i18n.I18nSupport {
 
-
-
    def index = Action { implicit request =>
     Ok(views.html.index(RbsBotsorm))
   }
@@ -75,7 +73,7 @@ class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: Messages
   }
 
 
-  def move = Action.async { implicit request =>
+  def getOpponentMove = Action.async { implicit request =>
 
     val url="http://localhost:7400/move "
 
@@ -86,6 +84,12 @@ class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: Messages
     futureResult.map{ res =>
       Ok(res)
     }
+  }
+
+  def dynamicMove(dynaCount : Int) = Action { implicit request =>
+
+    Ok(if(dynaCount!=0) scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS", "DYNAMITE"/*, "WATERBOMB"*/)).head else scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS")).head)
+
   }
 
   def lastOpponentMove = Action.async { implicit request =>
@@ -121,7 +125,8 @@ class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: Messages
 
     Ok(
       JavaScriptReverseRouter("jsRoutes")(
-        routes.javascript.HomeController.move,
+        routes.javascript.HomeController.getOpponentMove,
+        routes.javascript.HomeController.dynamicMove,
         routes.javascript.HomeController.lastOpponentMove
       )
     ).as("text/javascript")
