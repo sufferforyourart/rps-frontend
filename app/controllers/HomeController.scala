@@ -87,6 +87,7 @@ class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: Messages
   }
 
   def dynamicMove(dynaCount : Int) = Action { implicit request =>
+    "SCISSORS".filter(x=>x.isWhitespace )
 
     Ok(if(dynaCount!=0) scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS", "DYNAMITE"/*, "WATERBOMB"*/)).head else scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS")).head)
 

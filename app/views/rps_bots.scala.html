@@ -88,7 +88,7 @@
 
                     $('input[name="rps"]').prop('checked', false);
 
-                    $('#tabledata').animate({scrollTop: parseInt($('#tabledata').prop("scrollHeight"))}, 800);
+                    $('#tabledata').animate({scrollTop: parseInt($('#tabledata').prop("scrollHeight"))}, 300);
 
                     $('#count').attr('value',parseInt($('#count').val()) + 1);
                     var c = parseInt($('#count').val()) ;
@@ -106,7 +106,7 @@
 
                         setTimeout(function(){
                         jsRoutes.controllers.HomeController.dynamicMove(parseInt($('#dynamitecount').text())).ajax(ajax2)
-                        },1000);
+                        },400);
                     }
                 }
 
