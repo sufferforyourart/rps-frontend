@@ -1,4 +1,4 @@
-@(opponentName: String, pointsToWin: Int, maxRounds:Int, dynamiteCount:Int)(implicit messages: Messages)
+@(yourName: String, opponentName: String, pointsToWin: Int, maxRounds:Int, dynamiteCount:Int)(implicit messages: Messages)
 
 @main("Welcome RPS Bot") {
 
@@ -27,11 +27,11 @@
              </li>
             <li class="list-group-item">
                  <span class="badge" id="you">0</span><input hidden="true" value="0" id="count"/>
-                @opponentName point
+                @yourName point
             </li>
             <li class="list-group-item">
                  <span class="badge" id="system">0</span>
-                System point
+                @opponentName point
             </li>
          </ul>
      </div>
@@ -41,8 +41,8 @@
                  <table class="table display dataTable table-striped table-bordered" id='providersFormElementsTable'>
                      <thead>
                      <tr>
+                         <th>@yourName</th>
                          <th>@opponentName</th>
-                         <th>System</th>
                          <th>Result</th>
                      </tr>
                      </thead>
@@ -99,7 +99,7 @@
                     if(parseInt($('#you').text()) >=10 || parseInt($('#system').text()) >=10){
                         $("#allOptions").hide();
                         $('#winner').show();
-                        var image = $('<img></img>').attr('src', parseInt($('#you').text()) >=10 ? "http://www.placehold.it/187x60/DAF7A6/C70039&text=You Win" : "http://www.placehold.it/187x60/DAF7A6/C70039&text=You Lost");
+                        var image = $('<img></img>').attr('src', parseInt($('#you').text()) >=10 ? "http://www.placehold.it/187x60/DAF7A6/C70039&text=@yourName Win" : "http://www.placehold.it/187x60/DAF7A6/C70039&text=@opponentName Win");
                         image.appendTo('#winner')
 
                     } else {
@@ -120,7 +120,7 @@
                     success: successPostFn,
                     error: errorFn,
                     contentType: "application/json",
-                    data: JSON.stringify({"lastOpponentMove" :  $('input[name=rps]:checked').val(), "lastSystemMove" : data})});
+                    data: JSON.stringify({"player1" :  $('input[name=rps]:checked').val(), "player2" : data})});
          }
 
          function successDynamicFn(dynamicMove) {
@@ -160,9 +160,6 @@
             jsRoutes.controllers.HomeController.dynamicMove(parseInt($('#dynamitecount').text())).ajax(ajax2)
          }
          callme();
-
-
-
 
          });
 
