@@ -96,10 +96,10 @@
                     if(data1=="WIN"){ var a = parseInt($('#you').text()); $('#you').html(a + c); $('#count').attr('value', 0);}
                     if(data1=="LOST") {var b = parseInt($('#system').text());$('#system').html(b + c); $('#count').attr('value',0);}
 
-                    if(parseInt($('#you').text()) >=10 || parseInt($('#system').text()) >=10){
+                    if(parseInt($('#you').text()) >=@pointsToWin || parseInt($('#system').text()) >=@pointsToWin){
                         $("#allOptions").hide();
                         $('#winner').show();
-                        var image = $('<img></img>').attr('src', parseInt($('#you').text()) >=10 ? "http://www.placehold.it/187x60/DAF7A6/C70039&text=You Win" : "http://www.placehold.it/187x60/DAF7A6/C70039&text=You Lost");
+                        var image = $('<img></img>').attr('src', parseInt($('#you').text()) >=@pointsToWin ? "http://www.placehold.it/187x60/DAF7A6/C70039&text=You Win" : "http://www.placehold.it/187x60/DAF7A6/C70039&text=You Lost");
                         image.appendTo('#winner')
 
                     } else {
