@@ -35,9 +35,14 @@ import scala.util.{Failure, Success, Try}
 
 
 @Singleton
-class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: MessagesApi, context: ExecutionContext) extends Controller with i18n.I18nSupport {
+class HomeController @Inject() (ws: WSClient, config : Configuration)(implicit val messagesApi: MessagesApi, context: ExecutionContext) extends Controller with i18n.I18nSupport {
 
-   def index = Action { implicit request =>
+
+  lazy val player1 = config.getString(s"external-url.player1-service.host").getOrElse("")
+  lazy val player2 = config.getString(s"external-url.player2-service.host").getOrElse("")
+
+
+  def index = Action { implicit request =>
     Ok(views.html.index(RbsBotsorm))
   }
 
@@ -65,7 +70,7 @@ class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: Messages
 
 
   def sendData(person : RbsBots): Future[WSResponse] ={
-    val url="http://localhost:7400/start "
+    val url=s"$player1/start "
     ws.url(url).post(Json.toJson(person)).map {
      response =>
        (response)
@@ -75,7 +80,8 @@ class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: Messages
 
   def getOpponentMove = Action.async { implicit request =>
 
-    val url="http://localhost:7400/move "
+
+    val url= s"$player1/move "
 
     val futureResult: Future[String] = ws.url(url).get().map {
       response =>
@@ -87,7 +93,6 @@ class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: Messages
   }
 
   def dynamicMove(dynaCount : Int) = Action { implicit request =>
-    "SCISSORS".filter(x=>x.isWhitespace )
 
     Ok(if(dynaCount!=0) scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS", "DYNAMITE"/*, "WATERBOMB"*/)).head else scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS")).head)
 
@@ -97,7 +102,7 @@ class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: Messages
     Try(request.body.asJson) match {
       case Success(payload) =>
 
-        val url="http://localhost:7400/move "
+        val url=s"$player1/move "
         ws.url(url).post(Json.toJson(payload)).map {
           response =>
             val x =payload.map{ x =>
