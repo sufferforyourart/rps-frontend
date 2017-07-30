@@ -35,9 +35,14 @@ import scala.util.{Failure, Success, Try}
 
 
 @Singleton
-class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: MessagesApi, context: ExecutionContext) extends Controller with i18n.I18nSupport {
+class HomeController @Inject() (ws: WSClient, config : Configuration)(implicit val messagesApi: MessagesApi, context: ExecutionContext) extends Controller with i18n.I18nSupport {
 
-   def index = Action { implicit request =>
+
+  lazy val player1 = config.getString(s"external-url.player1-service.host").getOrElse("")
+  lazy val player2 = config.getString(s"external-url.player2-service.host").getOrElse("")
+
+
+  def index = Action { implicit request =>
     Ok(views.html.index(RbsBotsorm))
   }
 
@@ -66,8 +71,8 @@ class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: Messages
 
 
   def sendData(person : RbsBots): Future[WSResponse] ={
-    val url1="http://localhost:7400/start"
-    val url2="http://localhost:7500/start"
+    val url1=s"$player1/start"
+    val url2=s"$player2/start"
     ws.url(url1).post(Json.toJson(bot(person.yourName, person.pointsToWin, person.maxRounds, person.dynamiteCount))).flatMap { _ =>
        ws.url(url2).post(Json.toJson(bot(person.opponentName, person.pointsToWin, person.maxRounds, person.dynamiteCount))).map {
          response  => (response)
@@ -78,7 +83,8 @@ class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: Messages
 
   def getOpponentMove = Action.async { implicit request =>
 
-    val url="http://localhost:7400/move "
+
+    val url= s"$player1/move "
 
     val futureResult: Future[String] = ws.url(url).get().map {
       response =>
@@ -110,8 +116,8 @@ class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: Messages
     Try(request.body.asJson) match {
       case Success(payload) =>
 
-        val url1="http://localhost:7400/move"
-        val url2="http://localhost:7500/move"
+        val url1=s"$player1/move"
+        val url2=s"$player2/move"
 
         val result = payload.map{ y =>
           val player1 = (y \ "player1").as[String]
