@@ -95,20 +95,10 @@ class HomeController @Inject() (ws: WSClient, config : Configuration)(implicit v
     }
   }
 
-  def dynamicMove(dynaCount : Int) = /*Action { implicit request =>
+  def dynamicMove(dynaCount : Int) = Action { implicit request =>
 
-    Ok(if(dynaCount!=0) scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS", "DYNAMITE"/*, "WATERBOMB"*/)).head else scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS")).head)*/
-    Action.async { implicit request =>
+    Ok(if(dynaCount!=0) scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS", "DYNAMITE"/*, "WATERBOMB"*/)).head else scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS")).head)
 
-      val url="http://localhost:7500/move "
-
-      val futureResult: Future[String] = ws.url(url).get().map {
-        response =>
-          (response.json).as[String]
-      }
-      futureResult.map{ res =>
-        Ok(res)
-      }
     }
 
 
