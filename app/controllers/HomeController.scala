@@ -8,7 +8,7 @@ import play.api._
 import play.api.i18n.MessagesApi
 import play.api.mvc._
 import forms.RbsBotsForms._
-import models.{lastMove, RbsBots}
+import models.{bot, lastMove, RbsBots}
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc.Controller
@@ -35,9 +35,14 @@ import scala.util.{Failure, Success, Try}
 
 
 @Singleton
-class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: MessagesApi, context: ExecutionContext) extends Controller with i18n.I18nSupport {
+class HomeController @Inject() (ws: WSClient, config : Configuration)(implicit val messagesApi: MessagesApi, context: ExecutionContext) extends Controller with i18n.I18nSupport {
 
-   def index = Action { implicit request =>
+
+  lazy val player1 = config.getString(s"external-url.player1-service.host").getOrElse("")
+  lazy val player2 = config.getString(s"external-url.player2-service.host").getOrElse("")
+
+
+  def index = Action { implicit request =>
     Ok(views.html.index(RbsBotsorm))
   }
 
@@ -50,6 +55,7 @@ class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: Messages
               successSub => {
                 sendData(successSub)
                 Ok(views.html.rps_bots(
+                    successSub.yourName,
                     successSub.opponentName,
                     successSub.pointsToWin,
                     successSub.maxRounds,
@@ -59,23 +65,26 @@ class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: Messages
 
   }
 
-  def showRpsBot(opponentName: String, pointsToWin: Int, maxRounds:Int, dynamiteCount:Int) = Action { implicit request =>
-    Ok(views.html.rps_bots(opponentName, pointsToWin, maxRounds, dynamiteCount))
+  def showRpsBot(yourName: String, opponentName: String, pointsToWin: Int, maxRounds:Int, dynamiteCount:Int) = Action { implicit request =>
+    Ok(views.html.rps_bots(yourName, opponentName, pointsToWin, maxRounds, dynamiteCount))
   }
 
 
   def sendData(person : RbsBots): Future[WSResponse] ={
-    val url="http://localhost:7400/start "
-    ws.url(url).post(Json.toJson(person)).map {
-     response =>
-       (response)
-   }
+    val url1=s"$player1/start"
+    val url2=s"$player2/start"
+    ws.url(url1).post(Json.toJson(bot(person.yourName, person.pointsToWin, person.maxRounds, person.dynamiteCount))).flatMap { _ =>
+       ws.url(url2).post(Json.toJson(bot(person.opponentName, person.pointsToWin, person.maxRounds, person.dynamiteCount))).map {
+         response  => (response)
+       }
+    }
   }
 
 
   def getOpponentMove = Action.async { implicit request =>
 
-    val url="http://localhost:7400/move "
+
+    val url= s"$player1/move "
 
     val futureResult: Future[String] = ws.url(url).get().map {
       response =>
@@ -87,35 +96,41 @@ class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: Messages
   }
 
   def dynamicMove(dynaCount : Int) = Action { implicit request =>
-    "SCISSORS".filter(x=>x.isWhitespace )
 
     Ok(if(dynaCount!=0) scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS", "DYNAMITE"/*, "WATERBOMB"*/)).head else scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS")).head)
 
-  }
+    }
+
 
   def lastOpponentMove = Action.async { implicit request =>
     Try(request.body.asJson) match {
       case Success(payload) =>
 
-        val url="http://localhost:7400/move "
-        ws.url(url).post(Json.toJson(payload)).map {
-          response =>
-            val x =payload.map{ x =>
-              val lastOpponentMove = (x \ "lastOpponentMove").as[String]
-              val lastSystemMove = (x \ "lastSystemMove").as[String]
+        val url1=s"$player1/move"
+        val url2=s"$player2/move"
 
-              lastOpponentMove match {
-                case  x if(lastSystemMove==x) => "TIE"
-                case "ROCK" if(lastSystemMove!="DYNAMITE" && lastSystemMove!="PAPER") => "WIN"
-                case "PAPER" if(lastSystemMove!="DYNAMITE" && lastSystemMove!="SCISSORS") => "WIN"
-                case "SCISSORS" if(lastSystemMove!="DYNAMITE" && lastSystemMove!="ROCK") => "WIN"
-                case "DYNAMITE" if(lastSystemMove!="WATERBOMB") => "WIN"
-                case "WATERBOMB" if(lastSystemMove!="ROCK" && lastSystemMove!="PAPER" && lastSystemMove!="SCISSORS")=> "WIN"
-                case _ => "LOST"
-              }
-            }
-            Ok(x.getOrElse(""))
+        val result = payload.map{ y =>
+          val player1 = (y \ "player1").as[String]
+          val player2 = (y \ "player2").as[String]
+
+          for {
+            res1 <- ws.url(url1).post(Json.toJson(Map("lastOpponentMove" -> player1)))
+            res2 <- ws.url(url2).post(Json.toJson(Map("lastOpponentMove" -> player2)))
+          } yield(res1,res2)
+
+          player1 match {
+            case x if (player2 == x) => "TIE"
+            case "ROCK" if (player2 != "DYNAMITE" && player2 != "PAPER") => "WIN"
+            case "PAPER" if (player2 != "DYNAMITE" && player2 != "SCISSORS") => "WIN"
+            case "SCISSORS" if (player2 != "DYNAMITE" && player2 != "ROCK") => "WIN"
+            case "DYNAMITE" if (player2 != "WATERBOMB") => "WIN"
+            case "WATERBOMB" if (player2 != "ROCK" && player2 != "PAPER" && player2 != "SCISSORS") => "WIN"
+            case _ => "LOST"
+          }
         }
+
+        Future.successful(Ok(result.getOrElse("")))
+
       case Failure(e) =>
         Future.successful(BadRequest(s"Invalid payload: $e"))
     }

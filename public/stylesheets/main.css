@@ -29,8 +29,7 @@ border-right:1px solid #bfc1c3;
 padding:10px 0;
 }
 .score-area {
-  margin-bottom: 50px;
-  max-height: 400px;
+  max-height: 380px;
   overflow-y: auto;
 }
 

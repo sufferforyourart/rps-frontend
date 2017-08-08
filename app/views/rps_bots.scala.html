@@ -1,4 +1,4 @@
-@(opponentName: String, pointsToWin: Int, maxRounds:Int, dynamiteCount:Int)(implicit messages: Messages)
+@(yourName: String, opponentName: String, pointsToWin: Int, maxRounds:Int, dynamiteCount:Int)(implicit messages: Messages)
 
 @main("Welcome RPS Bot") {
 
@@ -17,27 +17,27 @@
                  <span class="badge">@pointsToWin</span>
                  Points to win
              </li>
-             <!--<li class="list-group-item">-->
-                 <!--<span class="badge">@maxRounds</span>-->
-                 <!--maxRounds-->
-             <!--</li>-->
              <li class="list-group-item">
-                 <span class="badge" id="dynamitecount">@{(pointsToWin*0.1).toInt}</span>
-                 dynamiteCount
+                 <span class="badge" id="player1">@{(pointsToWin*0.1).toInt}</span>
+                 @yourName dynamite count
+             </li>
+            <li class="list-group-item">
+                 <span class="badge" id="player2">@{(pointsToWin*0.1).toInt}</span>
+                @opponentName dynamite count
              </li>
             <li class="list-group-item">
                  <span class="badge" id="you">0</span><input hidden="true" value="0" id="count"/>
-                @opponentName point
+                @yourName point
             </li>
             <li class="list-group-item">
                  <span class="badge" id="system">0</span>
-                System point
+                @opponentName point
             </li>
          </ul>
      </div>
 <div class="row row-border first-row-top">
+    <div class="col-sm-4"><strong>@yourName</strong></div>
     <div class="col-sm-4"><strong>@opponentName</strong></div>
-    <div class="col-sm-4"><strong>System</strong></div>
     <div class="col-sm-4"><strong>Result</strong></div>
 </div>
 <div  id="tablebody11" class="score-area">
@@ -79,7 +79,6 @@
                             text: $('input[name=rps]:checked').val(),
                             click: function(e){
                             e.preventDefault();
-                            alert("test")
                             }}).appendTo(row1)
 
                       $('<div />', {
@@ -87,7 +86,6 @@
                             text: data,
                             click: function(e){
                             e.preventDefault();
-                            alert("test")
                             }}).appendTo(row1)
 
                     $('<div />', {
@@ -95,24 +93,15 @@
                             text: data1,
                             click: function(e){
                             e.preventDefault();
-                            alert("test")
                             }}).appendTo(row1)
-
-
-
-
-            //        var row = $('<tr></tr>')
-        //            $('<td></td>').text($('input[name=rps]:checked').val()).appendTo(row);
-          //          $('<td></td>').text(data).appendTo(row);
-             //       $('<td></td>').text(data1).appendTo(row);
-
-             //       row.appendTo("#tablebody");
 
                     row1.appendTo("#tablebody11");
 
+                    if(data=="DYNAMITE"){$("#player2").html(parseInt($('#player2').text()) -1);}
+
                     $('input[name="rps"]').prop('checked', false);
 
-                    $('#tablebody11').animate({scrollTop: parseInt($('#tablebody11').prop("scrollHeight"))}, 300);
+                   $('#tablebody11').animate({scrollTop: parseInt($('#tablebody11').prop("scrollHeight"))}, 300);
 
                     $('#count').attr('value',parseInt($('#count').val()) + 1);
                     var c = parseInt($('#count').val()) ;
@@ -123,19 +112,19 @@
                     if(parseInt($('#you').text()) >=@pointsToWin || parseInt($('#system').text()) >=@pointsToWin){
                         $("#allOptions").hide();
                         $('#winner').show();
-                        var image = $('<img></img>').attr('src', parseInt($('#you').text()) >=@pointsToWin ? "http://www.placehold.it/187x60/DAF7A6/C70039&text=You Win" : "http://www.placehold.it/187x60/DAF7A6/C70039&text=You Lost");
+                        var image = $('<img></img>').attr('src', parseInt($('#you').text()) >=@pointsToWin ? "http://www.placehold.it/187x60/DAF7A6/C70039&text=@yourName Win" : "http://www.placehold.it/187x60/DAF7A6/C70039&text=@opponentName Win");
                         image.appendTo('#winner')
 
                     } else {
 
                         setTimeout(function(){
-                        jsRoutes.controllers.HomeController.dynamicMove(parseInt($('#dynamitecount').text())).ajax(ajax2)
-                        },400);
+                        jsRoutes.controllers.HomeController.dynamicMove(parseInt($('#player1').text())).ajax(ajax2)
+                        },10);
                     }
                 }
 
-                if($('input[name=rps]:checked').val()=="DYNAMITE"){$("#dynamitecount").html(parseInt($('#dynamitecount').text()) -1);}
-                if(parseInt($('#dynamitecount').text())==0){$('div[id=DYNAMITE]').hide();}
+                if($('input[name=rps]:checked').val()=="DYNAMITE"){$("#player1").html(parseInt($('#player1').text()) -1);}
+                if(parseInt($('#player1').text())==0){$('div[id=DYNAMITE]').hide();}
 
 	        var r = jsRoutes.controllers.HomeController.lastOpponentMove();
 
@@ -144,7 +133,7 @@
                     success: successPostFn,
                     error: errorFn,
                     contentType: "application/json",
-                    data: JSON.stringify({"lastOpponentMove" :  $('input[name=rps]:checked').val(), "lastSystemMove" : data})});
+                    data: JSON.stringify({"player1" :  $('input[name=rps]:checked').val(), "player2" : data})});
          }
 
          function successDynamicFn(dynamicMove) {
@@ -181,12 +170,9 @@
          });
 
          function callme(){
-            jsRoutes.controllers.HomeController.dynamicMove(parseInt($('#dynamitecount').text())).ajax(ajax2)
+            jsRoutes.controllers.HomeController.dynamicMove(parseInt($('#player1').text())).ajax(ajax2)
          }
          callme();
-
-
-
 
          });
 

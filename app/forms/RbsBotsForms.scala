@@ -7,7 +7,8 @@ object RbsBotsForms {
 
   val RbsBotsorm = Form(
     mapping(
-      "opponentName" -> text(minLength = 5),
+      "yourName" -> text(minLength = 2),
+      "opponentName" -> text(minLength = 2),
       "pointsToWin" -> number,
       "maxRounds" -> number,
       "dynamiteCount" -> number
