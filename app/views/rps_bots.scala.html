@@ -35,21 +35,14 @@
             </li>
          </ul>
      </div>
+<div class="row row-border first-row-top">
+    <div class="col-sm-4"><strong>@opponentName</strong></div>
+    <div class="col-sm-4"><strong>System</strong></div>
+    <div class="col-sm-4"><strong>Result</strong></div>
+</div>
+<div  id="tablebody11" class="score-area">
+</div>
 
-     <div class="row">
-             <div id="tabledata" style="position: relative; overflow: auto; max-height: 400px; width: 100%;">
-                 <table class="table display dataTable table-striped table-bordered" id='providersFormElementsTable'>
-                     <thead>
-                     <tr>
-                         <th>@opponentName</th>
-                         <th>System</th>
-                         <th>Result</th>
-                     </tr>
-                     </thead>
-                     <tbody id="tablebody"></tbody>
-                 </table>
-             </div>
-     </div>
 
 <br>
 
@@ -79,16 +72,47 @@
 
                 var successPostFn = function(data1) {
 
-                    var row = $('<tr></tr>')
-                    $('<td></td>').text($('input[name=rps]:checked').val()).appendTo(row);
-                    $('<td></td>').text(data).appendTo(row);
-                    $('<td></td>').text(data1).appendTo(row);
+                    var row1 = $('<div class="row row-border"></div>')
 
-                    row.appendTo("#tablebody");
+                    $('<div />', {
+                            "class": 'col-sm-4',
+                            text: $('input[name=rps]:checked').val(),
+                            click: function(e){
+                            e.preventDefault();
+                            alert("test")
+                            }}).appendTo(row1)
+
+                      $('<div />', {
+                            "class": 'col-sm-4',
+                            text: data,
+                            click: function(e){
+                            e.preventDefault();
+                            alert("test")
+                            }}).appendTo(row1)
+
+                    $('<div />', {
+                            "class": 'col-sm-4',
+                            text: data1,
+                            click: function(e){
+                            e.preventDefault();
+                            alert("test")
+                            }}).appendTo(row1)
+
+
+
+
+            //        var row = $('<tr></tr>')
+        //            $('<td></td>').text($('input[name=rps]:checked').val()).appendTo(row);
+          //          $('<td></td>').text(data).appendTo(row);
+             //       $('<td></td>').text(data1).appendTo(row);
+
+             //       row.appendTo("#tablebody");
+
+                    row1.appendTo("#tablebody11");
 
                     $('input[name="rps"]').prop('checked', false);
 
-                    $('#tabledata').animate({scrollTop: parseInt($('#tabledata').prop("scrollHeight"))}, 300);
+                    $('#tablebody11').animate({scrollTop: parseInt($('#tablebody11').prop("scrollHeight"))}, 300);
 
                     $('#count').attr('value',parseInt($('#count').val()) + 1);
                     var c = parseInt($('#count').val()) ;

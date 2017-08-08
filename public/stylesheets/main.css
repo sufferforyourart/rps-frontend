@@ -11,3 +11,34 @@ dd.error{
 max-width:1025px;
 margin: auto :10px;
 }
+
+.first-row-top{
+border-top:1px solid #bfc1c3;
+}
+.row-wrapper {
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-bottom:1px solid #bfc1c3;
+}
+
+.row-border{
+border-bottom:1px solid #bfc1c3;
+border-left:1px solid #bfc1c3;
+border-right:1px solid #bfc1c3;
+padding:10px 0;
+}
+.score-area {
+  margin-bottom: 50px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.badge {
+	font-size: 20px;
+}
