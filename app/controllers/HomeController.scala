@@ -35,11 +35,7 @@ import scala.util.{Failure, Success, Try}
 
 
 @Singleton
-class HomeController @Inject() (ws: WSClient, config : Configuration)(implicit val messagesApi: MessagesApi, context: ExecutionContext) extends Controller with i18n.I18nSupport {
-
-
-  lazy val player1 = config.getString(s"external-url.player1-service.host").getOrElse("")
-  lazy val player2 = config.getString(s"external-url.player2-service.host").getOrElse("")
+class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: MessagesApi, context: ExecutionContext) extends Controller with i18n.I18nSupport {
 
 
   def index = Action { implicit request =>
@@ -55,67 +51,89 @@ class HomeController @Inject() (ws: WSClient, config : Configuration)(implicit v
               successSub => {
                 sendData(successSub)
                 Ok(views.html.rps_bots(
-                    successSub.yourName,
-                    successSub.opponentName,
-                    successSub.pointsToWin,
-                    successSub.maxRounds,
-                    successSub.dynamiteCount))
-                }
+                  successSub.player1Name,
+                  successSub.player2Name,
+                  successSub.pointsToWin,
+                  successSub.maxRounds,
+                  successSub.dynamiteCount,
+                  successSub.player1url,
+                  successSub.player2url))
+              }
     )
 
   }
 
-  def showRpsBot(yourName: String, opponentName: String, pointsToWin: Int, maxRounds:Int, dynamiteCount:Int) = Action { implicit request =>
-    Ok(views.html.rps_bots(yourName, opponentName, pointsToWin, maxRounds, dynamiteCount))
-  }
-
 
   def sendData(person : RbsBots): Future[WSResponse] ={
-    val url1=s"$player1/start"
-    val url2=s"$player2/start"
-    ws.url(url1).post(Json.toJson(bot(person.yourName, person.pointsToWin, person.maxRounds, person.dynamiteCount))).flatMap { _ =>
-       ws.url(url2).post(Json.toJson(bot(person.opponentName, person.pointsToWin, person.maxRounds, person.dynamiteCount))).map {
-         response  => (response)
-       }
+    if(person.player1url.isDefined && person.player2url.isDefined){
+      val url1=s"${person.player1url.get}/start"
+      val url2=s"${person.player2url.get}/start"
+      ws.url(url1).post(Json.toJson(bot(person.player1Name, person.pointsToWin, person.maxRounds, person.dynamiteCount))).flatMap { _ =>
+        ws.url(url2).post(Json.toJson(bot(person.player2Name, person.pointsToWin, person.maxRounds, person.dynamiteCount))).map {
+          response  => (response)
+        }
+      }
+    } else{
+      val url2=s"${person.player1url.getOrElse(person.player2url.get)}/start"
+      ws.url(url2).post(Json.toJson(bot(if(person.player1url.isDefined){person.player1Name} else {person.player2Name}, person.pointsToWin, person.maxRounds, person.dynamiteCount))).map {
+        response  => (response)
+      }
     }
   }
 
 
-  def getOpponentMove = Action.async { implicit request =>
+  def getPlayer1Move(dynaCount : Int, player1url: String) = Action.async { implicit request =>
 
 
-    val url= s"$player1/move "
-
-    val futureResult: Future[String] = ws.url(url).get().map {
-      response =>
-        (response.json).as[String]
+    if(player1url!="no") {
+      val url = s"${player1url}/move"
+      val futureResult: Future[String] = ws.url(url).get().map {
+        response =>
+          (response.json).as[String]
+      }
+      futureResult.map{ res =>
+        Ok(res)
+      }
+    } else {
+      Future.successful(
+        Ok(if(dynaCount!=0) scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS", "DYNAMITE"/*, "WATERBOMB"*/)).head else scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS")).head)
+      )
     }
-    futureResult.map{ res =>
-      Ok(res)
-    }
+
   }
 
-  def dynamicMove(dynaCount : Int) = Action { implicit request =>
+  def getPlayer2Move(dynaCount : Int, player2url: String) = Action.async { implicit request =>
 
-    Ok(if(dynaCount!=0) scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS", "DYNAMITE"/*, "WATERBOMB"*/)).head else scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS")).head)
-
+    if(player2url!="no") {
+      val url = s"${player2url}/move"
+      val futureResult: Future[String] = ws.url(url).get().map {
+        response =>
+          (response.json).as[String]
+      }
+      futureResult.map{ res =>
+        Ok(res)
+      }
+    } else {
+      Future.successful(
+        Ok(if(dynaCount!=0) scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS", "DYNAMITE"/*, "WATERBOMB"*/)).head else scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS")).head)
+      )
     }
+  }
 
 
   def lastOpponentMove = Action.async { implicit request =>
     Try(request.body.asJson) match {
       case Success(payload) =>
 
-        val url1=s"$player1/move"
-        val url2=s"$player2/move"
-
         val result = payload.map{ y =>
           val player1 = (y \ "player1").as[String]
           val player2 = (y \ "player2").as[String]
+          val url1= (y \ "player1url").as[String]
+          val url2= (y \ "player2url").as[String]
 
           for {
-            res1 <- ws.url(url1).post(Json.toJson(Map("lastOpponentMove" -> player1)))
-            res2 <- ws.url(url2).post(Json.toJson(Map("lastOpponentMove" -> player2)))
+            res1 <- if(url1!="no"){ws.url(s"$url1/move").post(Json.toJson(Map("lastOpponentMove" -> player2)))} else Future(url1)
+            res2 <- if(url2!="no"){ws.url(s"$url2/move").post(Json.toJson(Map("lastOpponentMove" -> player1)))} else Future(url2)
           } yield(res1,res2)
 
           player1 match {
@@ -141,8 +159,8 @@ class HomeController @Inject() (ws: WSClient, config : Configuration)(implicit v
 
     Ok(
       JavaScriptReverseRouter("jsRoutes")(
-        routes.javascript.HomeController.getOpponentMove,
-        routes.javascript.HomeController.dynamicMove,
+        routes.javascript.HomeController.getPlayer1Move,
+        routes.javascript.HomeController.getPlayer2Move,
         routes.javascript.HomeController.lastOpponentMove
       )
     ).as("text/javascript")

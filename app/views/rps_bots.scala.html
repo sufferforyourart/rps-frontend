@@ -1,4 +1,4 @@
-@(yourName: String, opponentName: String, pointsToWin: Int, maxRounds:Int, dynamiteCount:Int)(implicit messages: Messages)
+@(player1Name: String, player2Name: String, pointsToWin: Int, maxRounds:Int, dynamiteCount:Int, player1url: Option[String], player2url: Option[String])(implicit messages: Messages)
 
 @main("Welcome RPS Bot") {
 
@@ -19,25 +19,25 @@
              </li>
              <li class="list-group-item">
                  <span class="badge" id="player1">@{(pointsToWin*0.1).toInt}</span>
-                 @yourName dynamite count
+                 @player1Name dynamite count
              </li>
             <li class="list-group-item">
                  <span class="badge" id="player2">@{(pointsToWin*0.1).toInt}</span>
-                @opponentName dynamite count
+                @player2Name dynamite count
              </li>
             <li class="list-group-item">
                  <span class="badge" id="you">0</span><input hidden="true" value="0" id="count"/>
-                @yourName point
+                @player1Name point
             </li>
             <li class="list-group-item">
                  <span class="badge" id="system">0</span>
-                @opponentName point
+                @player2Name point
             </li>
          </ul>
      </div>
 <div class="row row-border first-row-top">
-    <div class="col-sm-4"><strong>@yourName</strong></div>
-    <div class="col-sm-4"><strong>@opponentName</strong></div>
+    <div class="col-sm-4"><strong>@player1Name</strong></div>
+    <div class="col-sm-4"><strong>@player2Name</strong></div>
     <div class="col-sm-4"><strong>Result</strong></div>
 </div>
 <div  id="tablebody11" class="score-area">
@@ -112,15 +112,15 @@
                     if(parseInt($('#you').text()) >=@pointsToWin || parseInt($('#system').text()) >=@pointsToWin){
                         $("#allOptions").hide();
                         $('#winner').show();
-                        var image = $('<img></img>').attr('src', parseInt($('#you').text()) >=@pointsToWin ? "http://www.placehold.it/187x60/DAF7A6/C70039&text=@yourName Win" : "http://www.placehold.it/187x60/DAF7A6/C70039&text=@opponentName Win");
+                        var image = $('<img></img>').attr('src', parseInt($('#you').text()) >=@pointsToWin ? "http://www.placehold.it/187x60/DAF7A6/C70039&text=@player1Name Win" : "http://www.placehold.it/187x60/DAF7A6/C70039&text=@player2Name Win");
                         image.appendTo('#winner')
 
-                    } else {
+                    } /*else {
 
                         setTimeout(function(){
-                        jsRoutes.controllers.HomeController.dynamicMove(parseInt($('#player1').text())).ajax(ajax2)
+                        jsRoutes.controllers.HomeController.getPlayer2Move(parseInt($('#player2').text()), '@player2url.getOrElse("no")').ajax(ajax2)
                         },10);
-                    }
+                    }*/
                 }
 
                 if($('input[name=rps]:checked').val()=="DYNAMITE"){$("#player1").html(parseInt($('#player1').text()) -1);}
@@ -133,7 +133,7 @@
                     success: successPostFn,
                     error: errorFn,
                     contentType: "application/json",
-                    data: JSON.stringify({"player1" :  $('input[name=rps]:checked').val(), "player2" : data})});
+                    data: JSON.stringify({"player1" :  $('input[name=rps]:checked').val(), "player2" : data, "player1url":'@player1url.getOrElse("no")', "player2url":'@player2url.getOrElse("no")'})});
          }
 
          function successDynamicFn(dynamicMove) {
@@ -165,14 +165,14 @@
             $(this).find('div').addClass('checked');
             $('input[type=radio].radio-image').attr('checked', false);
             $check.prop('checked', true);
-            jsRoutes.controllers.HomeController.getOpponentMove().ajax(ajax1)
+            jsRoutes.controllers.HomeController.getPlayer1Move(parseInt($('#player2').text()), '@player1url.getOrElse("no")').ajax(ajax1)
 
          });
 
-         function callme(){
-            jsRoutes.controllers.HomeController.dynamicMove(parseInt($('#player1').text())).ajax(ajax2)
+         /*function callme(){
+            jsRoutes.controllers.HomeController.getPlayer2Move(parseInt($('#player2').text()), '@player2url.getOrElse("no")').ajax(ajax2)
          }
-         callme();
+         callme();*/
 
          });
 

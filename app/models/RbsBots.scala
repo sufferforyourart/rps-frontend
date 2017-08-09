@@ -1,11 +1,10 @@
 package models
 import play.api.libs.json.Json
 
-case class RbsBots(yourName: String, opponentName: String, pointsToWin: Int, maxRounds:Int, dynamiteCount:Int)
+case class RbsBots(player1Name: String,player2Name: String,
+                   pointsToWin: Int, maxRounds:Int, dynamiteCount:Int,
+                   player1url: Option[String], player2url: Option[String])
 
-object RbsBots {
-  implicit val formats = Json.format[RbsBots]
-}
 
 case class bot(opponentName: String, pointsToWin: Int, maxRounds:Int, dynamiteCount:Int)
 

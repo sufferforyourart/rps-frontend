@@ -11,8 +11,10 @@
      <div class="row">
 
       @helper.form(action = routes.HomeController.submit, 'enctype -> "multipart/form-data") {
-        @helper.inputText(form("yourName"),'_label -> "Enter Name of Player 1")
-        @helper.inputText(form("opponentName"),'_label -> "Enter Name of Player 2")
+        @helper.inputText(form("player1Name"),'_label -> "Enter Name of Player 1")
+        @helper.inputText(form("player1url"),'_label -> "Enter System url for Player 1")
+        @helper.inputText(form("player2Name"),'_label -> "Enter Name of Player 2")
+        @helper.inputText(form("player2url"),'_label -> "Enter System url for Player 2")
         @helper.inputText(form("pointsToWin"),'_label -> "Enter your pointsToWin")
         @helper.inputText(form("maxRounds"),'_label -> "Enter your maxRounds")
         @helper.inputText(form("dynamiteCount"), '_label -> "Enter dynamiteCount")
