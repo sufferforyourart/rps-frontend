@@ -26,10 +26,10 @@ border-top:1px solid #bfc1c3;
 border-bottom:1px solid #bfc1c3;
 border-left:1px solid #bfc1c3;
 border-right:1px solid #bfc1c3;
-padding:10px 0;
+padding:7px 0;
 }
 .score-area {
-  max-height: 380px;
+  max-height: 320px;
   overflow-y: auto;
 }
 
@@ -37,7 +37,62 @@ padding:10px 0;
   margin-left: 0 !important;
   margin-right: 0 !important;
 }
+.col-xs-12 {
+ width: 100%;
+ margin-top: 10px;
+}
 
 .badge {
 	font-size: 20px;
+}
+
+.control-label{
+    text-align: right;
+    padding-top: 8px;
+}
+.badge {
+    display: unset;
+}
+
+
+label {display:block;}
+.radio {
+    width: 170px;
+    height: 60px;
+    float: left;
+    margin: 5px;
+}
+.checked {opacity: 1;}
+#ROCK {background: url(http://www.placehold.it/170x60/DAF7A6/C70039&text=ROCK);}
+#PAPER {background: url(http://www.placehold.it/170x60/DAF7A6/C70039&text=PAPER);}
+#SCISSORS {background: url(http://www.placehold.it/170x60/DAF7A6/C70039&text=SCISSORS);}
+#DYNAMITE {background: url(http://www.placehold.it/170x60/DAF7A6/C70039&text=DYNAMITE);}
+#WATERBOMB {background: url(http://www.placehold.it/170x60/DAF7A6/C70039&text=WATERBOMB);}
+
+.progress {
+  width: 100%;
+  background-color: #ddd;
+  height: 30px !important;
+  margin: 0;
+}
+
+.progressBar {
+  width: 0%;
+  height: 30px;
+  text-align: center;
+  line-height: 30px;
+  color: white;
+}
+.progressBarGreen{
+  background-color: #05f505;
+}
+.progressBarRed{
+  background-color: #ff0000
+}
+.progressBarYellow{
+  background-color: #ffff00
+}
+.tableHeader{
+  color: #31708f;
+  background-color: #d9edf7;
 }

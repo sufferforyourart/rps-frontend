@@ -1,51 +1,52 @@
 @(player1Name: String, player2Name: String, pointsToWin: Int, maxRounds:Int, dynamiteCount:Int, player1url: Option[String], player2url: Option[String])(implicit messages: Messages)
 
 @main("Welcome RPS Bot") {
-
-        <div class="row">
-            <div class="page-header">
-                <h1>RPS Bots Information</h1>
-            </div>
-
+<div class="row">
+    <div class='panel-heading'><br></div>
+</div>
+<div class='container'>
+    <div class='panel panel-primary dialog-panel'>
+        <div class='panel-heading'>
+            <h1>RPS Bot</h1>
         </div>
+        <div class='panel-body'>
 
 @helper.form(action = routes.HomeController.submit, 'enctype -> "multipart/form-data" ) {
 
-    <div class="row">
-        <ul class="list-group">
-             <li class="list-group-item">
-                 <span class="badge">@pointsToWin</span>
-                 Points to win
-             </li>
-             <li class="list-group-item">
-                 <span class="badge" id="player1">@{(pointsToWin*0.1).toInt}</span>
-                 @player1Name dynamite count
-             </li>
-            <li class="list-group-item">
-                 <span class="badge" id="player2">@{(pointsToWin*0.1).toInt}</span>
-                @player2Name dynamite count
-             </li>
-            <li class="list-group-item">
-                 <span class="badge" id="you">0</span><input hidden="true" value="0" id="count"/>
-                @player1Name point
-            </li>
-            <li class="list-group-item">
-                 <span class="badge" id="system">0</span>
-                @player2Name point
-            </li>
-         </ul>
-     </div>
-<div class="row row-border first-row-top">
-    <div class="col-sm-4"><strong>@player1Name</strong></div>
-    <div class="col-sm-4"><strong>@player2Name</strong></div>
-    <div class="col-sm-4"><strong>Result</strong></div>
-</div>
-<div  id="tablebody11" class="score-area">
-</div>
+    <div class="row row-border first-row-top">
+        <div class="col-sm-3"><label class='control-label'>Points to win</label></div>
+        <div class="col-sm-8"></div>
+        <div class="col-sm-1"><span class="badge">@pointsToWin</span></div>
+    </div>
+    <div class="row row-border">
+        <div class="col-sm-3"><label class='control-label'>@player1Name dynamite count</label></div>
+        <div class="col-sm-8"></div>
+        <div class="col-sm-1"><span class="badge" id="player1">@{(pointsToWin*0.1).toInt}</span></div>
+    </div>
+    <div class="row row-border">
+        <div class="col-sm-3"><label class='control-label'>@player2Name dynamite count</label></div>
+        <div class="col-sm-8"></div>
+        <div class="col-sm-1"><span class="badge" id="player2">@{(pointsToWin*0.1).toInt}</span></span></div>
+    </div>
+    <div class="row row-border">
+        <div class="col-sm-3"><label class='control-label'>@player1Name point</label></div>
+        <div class="col-sm-8"><div class="progress"><div id="you_progress" class="progressBar progressBarYellow"></div></div></div>
+        <div class="col-sm-1"><span class="badge" id="you">0</span><input hidden="true" value="0" id="count"/></div>
+    </div>
+    <div class="row row-border">
+        <div class="col-sm-3"><label class='control-label'>@player2Name point</label></div>
+        <div class="col-sm-8"><div class="progress"><div id="opponent_progress" class="progressBar progressBarYellow"></div></div></div>
+        <div class="col-sm-1"><span class="badge" id="system">0</span></div>
+    </div>
 
+            <div class="row"><br></div>
 
-<br>
-
+    <div class="row row-border first-row-top tableHeader">
+        <div class="col-sm-4"><strong>@player1Name</strong></div>
+        <div class="col-sm-4"><strong>@player2Name</strong></div>
+        <div class="col-sm-4"><strong>Result</strong></div>
+    </div>
+    <div  id="tablebody11" class="score-area"></div>
         <div class="row">
             <div class="col-xs-12">
                 <div id="winner" style="display:none; width:100%; text-align:center"></div>
@@ -62,6 +63,9 @@
         </div>
 
         }
+        </div>
+    </div>
+</div>
 
          <script>
 
@@ -97,6 +101,9 @@
 
                     row1.appendTo("#tablebody11");
 
+                    if($('input[name=rps]:checked').val()=="DYNAMITE"){$("#player1").html(parseInt($('#player1').text()) -1);}
+
+
                     if(data=="DYNAMITE"){$("#player2").html(parseInt($('#player2').text()) -1);}
 
                     $('input[name="rps"]').prop('checked', false);
@@ -106,25 +113,52 @@
                     $('#count').attr('value',parseInt($('#count').val()) + 1);
                     var c = parseInt($('#count').val()) ;
 
-                    if(data1=="WIN"){ var a = parseInt($('#you').text()); $('#you').html(a + c); $('#count').attr('value', 0);}
-                    if(data1=="LOST") {var b = parseInt($('#system').text());$('#system').html(b + c); $('#count').attr('value',0);}
+                    if(data1=="WIN"){
+                    var a = parseInt($('#you').text());
+                     $('#you').html(a + c);
+                     $('#you_progress').width(parseInt(((a + c)/@pointsToWin)*100)+'%');
+                     $('#count').attr('value', 0);
+                     }
+                    if(data1=="LOST") {
+                     var b = parseInt($('#system').text());
+                     $('#system').html(b + c);
+                     $('#opponent_progress').width(parseInt(((b + c)/@pointsToWin)*100)+'%');
+                     $('#count').attr('value',0);
+                    }
+                    var a = parseInt($('#you').text());
+                    var b = parseInt($('#system').text());
+                    if(a==b){
+                     $('#you_progress').removeClass('progressBarGreen progressBarRed');
+                     $('#you_progress').addClass("progressBarYellow");
+                     $('#opponent_progress').removeClass('progressBarGreen progressBarRed');
+                     $('#opponent_progress').addClass("progressBarYellow");
+                    } else if(a>b){
+                     $('#you_progress').removeClass('progressBarRed progressBarYellow');
+                     $('#you_progress').addClass("progressBarGreen");
+                     $('#opponent_progress').removeClass('progressBarGreen progressBarYellow');
+                     $('#opponent_progress').addClass("progressBarRed");
+                    }else{
+                     $('#opponent_progress').removeClass('progressBarRed progressBarYellow');
+                     $('#opponent_progress').addClass("progressBarGreen");
+                     $('#you_progress').removeClass('progressBarGreen progressBarYellow');
+                     $('#you_progress').addClass("progressBarRed");
+                    }
 
                     if(parseInt($('#you').text()) >=@pointsToWin || parseInt($('#system').text()) >=@pointsToWin){
                         $("#allOptions").hide();
                         $('#winner').show();
-                        var image = $('<img></img>').attr('src', parseInt($('#you').text()) >=@pointsToWin ? "http://www.placehold.it/187x60/DAF7A6/C70039&text=@player1Name Win" : "http://www.placehold.it/187x60/DAF7A6/C70039&text=@player2Name Win");
+                        var image = $('<img></img>').attr('src', parseInt($('#you').text()) >=@pointsToWin ? "http://www.placehold.it/500x60/DAF7A6/C70039&text=congratulations a winner is @player1Name !" : "http://www.placehold.it/500x60/DAF7A6/C70039&text=congratulations a winner is @player2Name !");
                         image.appendTo('#winner')
 
-                    } /*else {
+                    } else {
 
                         setTimeout(function(){
-                        jsRoutes.controllers.HomeController.getPlayer2Move(parseInt($('#player2').text()), '@player2url.getOrElse("no")').ajax(ajax2)
+                        jsRoutes.controllers.HomeController.getPlayer1Move(parseInt($('#player1').text()), '@player1url.getOrElse("no")').ajax(ajax2)
                         },10);
-                    }*/
+                    }
                 }
 
-                if($('input[name=rps]:checked').val()=="DYNAMITE"){$("#player1").html(parseInt($('#player1').text()) -1);}
-                if(parseInt($('#player1').text())==0){$('div[id=DYNAMITE]').hide();}
+            if(parseInt($('#player1').text())==0){$('div[id=DYNAMITE]').hide();}
 
 	        var r = jsRoutes.controllers.HomeController.lastOpponentMove();
 
@@ -165,14 +199,14 @@
             $(this).find('div').addClass('checked');
             $('input[type=radio].radio-image').attr('checked', false);
             $check.prop('checked', true);
-            jsRoutes.controllers.HomeController.getPlayer1Move(parseInt($('#player2').text()), '@player1url.getOrElse("no")').ajax(ajax1)
+            jsRoutes.controllers.HomeController.getPlayer2Move(parseInt($('#player2').text()), '@player2url.getOrElse("no")').ajax(ajax1)
 
          });
 
-         /*function callme(){
-            jsRoutes.controllers.HomeController.getPlayer2Move(parseInt($('#player2').text()), '@player2url.getOrElse("no")').ajax(ajax2)
+         function callme(){
+            jsRoutes.controllers.HomeController.getPlayer1Move(parseInt($('#player1').text()), '@player1url.getOrElse("no")').ajax(ajax2)
          }
-         callme();*/
+         callme();
 
          });
 

@@ -92,11 +92,15 @@ class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: Messages
           (response.json).as[String]
       }
       futureResult.map{ res =>
-        Ok(res)
+        if(dynaCount<=0 && res == "DYNAMITE"){
+          Ok("WATERBOMB")
+        } else {
+          Ok(res)
+        }
       }
     } else {
       Future.successful(
-        Ok(if(dynaCount!=0) scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS", "DYNAMITE"/*, "WATERBOMB"*/)).head else scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS")).head)
+        Ok(if(dynaCount!=0) scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS", "DYNAMITE", "WATERBOMB")).head else scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS")).head)
       )
     }
 
@@ -111,11 +115,15 @@ class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: Messages
           (response.json).as[String]
       }
       futureResult.map{ res =>
-        Ok(res)
+        if(dynaCount<=0 && res == "DYNAMITE"){
+          Ok("WATERBOMB")
+        } else {
+          Ok(res)
+        }
       }
     } else {
       Future.successful(
-        Ok(if(dynaCount!=0) scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS", "DYNAMITE"/*, "WATERBOMB"*/)).head else scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS")).head)
+        Ok(if(dynaCount!=0) scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS", "DYNAMITE", "WATERBOMB")).head else scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS")).head)
       )
     }
   }
