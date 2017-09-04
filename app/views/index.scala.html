@@ -13,12 +13,20 @@
             @helper.form(action = routes.HomeController.submit, 'enctype -> "multipart/form-data" ) {
                 <div class="row"><br></div>
                 <div class="row">
-                        <div class="col-sm-3"><label class='control-label' for='yourName'>Enter Name of Player 1</label></div>
-                        <div class="col-sm-6">@helper.inputText(form("yourName"),'_label -> "")</div>
+                        <div class="col-sm-3"><label class='control-label' for='player1Name'>Enter Name of Player 1</label></div>
+                        <div class="col-sm-6">@helper.inputText(form("player1Name"),'_label -> "")</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-3"><label class='control-label' for='opponentName'>Enter Name of Player 2</label></div>
-                    <div class="col-sm-6">@helper.inputText(form("opponentName"),'_label -> "")</div>
+                    <div class="col-sm-3"><label class='control-label' for='player1url'>Enter System url for Player 1</label></div>
+                    <div class="col-sm-6">@helper.inputText(form("player1url"),'_label -> "")</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-3"><label class='control-label' for='player2Name'>Enter Name of Player 2</label></div>
+                    <div class="col-sm-6">@helper.inputText(form("player2Name"),'_label -> "")</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-3"><label class='control-label' for='player2url'>Enter System url for Player 2</label></div>
+                    <div class="col-sm-6">@helper.inputText(form("player2url"),'_label -> "")</div>
                 </div>
                 <div class="row">
                     <div class="col-sm-3"><label class='control-label' for='pointsToWin'>Enter your pointsToWin</label></div>
