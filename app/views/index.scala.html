@@ -2,7 +2,7 @@
 
 @main("Welcome RPS Bot") {
 <div class="row">
-    <div class='panel-heading'><br></div>
+    <div class='panel-heading'></div>
 </div>
 <div class='container'>
     <div class='panel panel-primary dialog-panel'>
@@ -11,34 +11,47 @@
         </div>
         <div class='panel-body'>
             @helper.form(action = routes.HomeController.submit, 'enctype -> "multipart/form-data" ) {
-                <div class="row"><br></div>
-                <div class="row">
-                        <div class="col-sm-3"><label class='control-label' for='player1Name'>Enter Name of Player 1</label></div>
-                        <div class="col-sm-6">@helper.inputText(form("player1Name"),'_label -> "")</div>
+                <div class="row" id="numberOfBotsContainer">
+                    <div class="col-sm-3"><label class='control-label' >Select RPS Bot count</label></div>
+                    <div class="col-sm-7 buttonGroup">@helper.inputRadioGroup(form("numberOfBots"),
+                        options = Seq(("1"->"1 Bot"),("2"->"2 Bots")), '_value -> "1", '_label -> ""
+                        )
+                    </div>
+                </div>
+                <div class="row" id="modeContainer">
+                    <div class="col-sm-3"><label class='control-label'>Select mode</label></div>
+                    <div class="col-sm-7 buttonGroup">@helper.inputRadioGroup(form("mode"),
+                            options = Seq(("manualMove"->"Manual -> you will play against system defined"),("autoMove"->"Automatic -> Random.shuffle will play against system defined")), '_label -> ""
+                            )
+                    </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-3"><label class='control-label' for='player1url'>Enter System url for Player 1</label></div>
-                    <div class="col-sm-6">@helper.inputText(form("player1url"),'_label -> "")</div>
+                        <div class="col-sm-3"><label class='control-label'>Enter Name of Player 1</label></div>
+                        <div class="col-sm-7">@helper.inputText(form("player1Name"),'_label -> "")</div>
+                </div>
+                <div class="row" id="player1UrlContainer">
+                    <div class="col-sm-3"><label class='control-label'>Enter System url for Player 1</label></div>
+                    <div class="col-sm-7">@helper.inputText(form("player1url"),'_label -> "")</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-3"><label class='control-label' for='player2Name'>Enter Name of Player 2</label></div>
-                    <div class="col-sm-6">@helper.inputText(form("player2Name"),'_label -> "")</div>
+                    <div class="col-sm-3"><label class='control-label'>Enter Name of Player 2</label></div>
+                    <div class="col-sm-7">@helper.inputText(form("player2Name"),'_label -> "")</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-3"><label class='control-label' for='player2url'>Enter System url for Player 2</label></div>
-                    <div class="col-sm-6">@helper.inputText(form("player2url"),'_label -> "")</div>
+                    <div class="col-sm-3"><label class='control-label'>Enter System url for Player 2</label></div>
+                    <div class="col-sm-7">@helper.inputText(form("player2url"),'_label -> "")</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-3"><label class='control-label' for='pointsToWin'>Enter your pointsToWin</label></div>
-                    <div class="col-sm-6">@helper.inputText(form("pointsToWin"),'_label -> "")</div>
+                    <div class="col-sm-3"><label class='control-label'>Enter your pointsToWin</label></div>
+                    <div class="col-sm-7">@helper.inputText(form("pointsToWin"),'_label -> "")</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-3"><label class='control-label' for='maxRounds'>Enter your maxRound</label></div>
-                    <div class="col-sm-6">@helper.inputText(form("maxRounds"),'_label -> "Enter your maxRounds")</div>
+                    <div class="col-sm-3"><label class='control-label'>Enter your maxRound</label></div>
+                    <div class="col-sm-7">@helper.inputText(form("maxRounds"),'_label -> "")</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-3"><label class='control-label' for='dynamiteCount'>Enter dynamiteCount</label></div>
-                    <div class="col-sm-6">@helper.inputText(form("dynamiteCount"), '_label -> "Enter dynamiteCount")</div>
+                    <div class="col-sm-3"><label class='control-label'>Enter dynamiteCount</label></div>
+                    <div class="col-sm-7">@helper.inputText(form("dynamiteCount"), '_label -> "")</div>
                 </div>
                 <div class='form-group'>
                     <div class='col-md-offset-4 col-md-2'>
@@ -52,4 +65,19 @@
         </div>
     </div>
 </div>
+    <script>
+
+         $( document ).ready(function() {
+            $('#numberOfBotsContainer input:radio').click(function() {
+               if($(this).val()=="1"){
+                   $("#modeContainer").show();
+                   $("#player1UrlContainer").hide();
+               } else {
+                   $("#modeContainer").hide();
+                   $("#player1UrlContainer").show();
+               }
+            });
+
+         });
+    </script>
 }

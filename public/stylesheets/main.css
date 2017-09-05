@@ -29,6 +29,7 @@ border-right:1px solid #bfc1c3;
 padding:7px 0;
 }
 .score-area {
+  height: 320px;
   max-height: 320px;
   overflow-y: auto;
 }
@@ -95,4 +96,26 @@ label {display:block;}
 .tableHeader{
   color: #31708f;
   background-color: #d9edf7;
+}
+input[name=numberOfBots]{
+  float : left;
+  margin-top: -1px;
+  vertical-align: middle;
+}
+input[name=mode]{
+  float : left;
+  margin-top: -1px;
+  vertical-align: middle;
+}
+.buttonGroup label{
+    padding-left: 20px;
+    margin: 9px;
+    font-weight: 200;
+}
+
+.btn-group-lg > .btn, .btn-lg {
+    padding: 3px 20px;
+    font-size: 18px;
+    line-height: 1.3333333;
+    border-radius: 6px;
 }

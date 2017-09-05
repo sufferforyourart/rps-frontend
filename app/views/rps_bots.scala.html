@@ -1,8 +1,8 @@
-@(player1Name: String, player2Name: String, pointsToWin: Int, maxRounds:Int, dynamiteCount:Int, player1url: Option[String], player2url: Option[String])(implicit messages: Messages)
+@(successSub: RbsBots)(implicit messages: Messages)
 
 @main("Welcome RPS Bot") {
 <div class="row">
-    <div class='panel-heading'><br></div>
+    <div class='panel-heading'></div>
 </div>
 <div class='container'>
     <div class='panel panel-primary dialog-panel'>
@@ -16,25 +16,25 @@
     <div class="row row-border first-row-top">
         <div class="col-sm-3"><label class='control-label'>Points to win</label></div>
         <div class="col-sm-8"></div>
-        <div class="col-sm-1"><span class="badge">@pointsToWin</span></div>
+        <div class="col-sm-1"><span class="badge">@{successSub.pointsToWin}</span></div>
     </div>
     <div class="row row-border">
-        <div class="col-sm-3"><label class='control-label'>@player1Name dynamite count</label></div>
+        <div class="col-sm-3"><label class='control-label'>@{successSub.player1Name} dynamite count</label></div>
         <div class="col-sm-8"></div>
-        <div class="col-sm-1"><span class="badge" id="player1">@{(pointsToWin*0.1).toInt}</span></div>
+        <div class="col-sm-1"><span class="badge" id="player1">@{({successSub.dynamiteCount}).toInt}</span></div>
     </div>
     <div class="row row-border">
-        <div class="col-sm-3"><label class='control-label'>@player2Name dynamite count</label></div>
+        <div class="col-sm-3"><label class='control-label'>@{successSub.player2Name} dynamite count</label></div>
         <div class="col-sm-8"></div>
-        <div class="col-sm-1"><span class="badge" id="player2">@{(pointsToWin*0.1).toInt}</span></span></div>
+        <div class="col-sm-1"><span class="badge" id="player2">@{({successSub.dynamiteCount}).toInt}</span></span></div>
     </div>
     <div class="row row-border">
-        <div class="col-sm-3"><label class='control-label'>@player1Name point</label></div>
+        <div class="col-sm-3"><label class='control-label'>@{successSub.player1Name} point</label></div>
         <div class="col-sm-8"><div class="progress"><div id="you_progress" class="progressBar progressBarYellow"></div></div></div>
         <div class="col-sm-1"><span class="badge" id="you">0</span><input hidden="true" value="0" id="count"/></div>
     </div>
     <div class="row row-border">
-        <div class="col-sm-3"><label class='control-label'>@player2Name point</label></div>
+        <div class="col-sm-3"><label class='control-label'>@{successSub.player2Name} point</label></div>
         <div class="col-sm-8"><div class="progress"><div id="opponent_progress" class="progressBar progressBarYellow"></div></div></div>
         <div class="col-sm-1"><span class="badge" id="system">0</span></div>
     </div>
@@ -42,8 +42,8 @@
             <div class="row"><br></div>
 
     <div class="row row-border first-row-top tableHeader">
-        <div class="col-sm-4"><strong>@player1Name</strong></div>
-        <div class="col-sm-4"><strong>@player2Name</strong></div>
+        <div class="col-sm-4"><strong>@{successSub.player1Name}</strong></div>
+        <div class="col-sm-4"><strong>@{successSub.player2Name}</strong></div>
         <div class="col-sm-4"><strong>Result</strong></div>
     </div>
     <div  id="tablebody11" class="score-area"></div>
@@ -116,13 +116,13 @@
                     if(data1=="WIN"){
                     var a = parseInt($('#you').text());
                      $('#you').html(a + c);
-                     $('#you_progress').width(parseInt(((a + c)/@pointsToWin)*100)+'%');
+                     $('#you_progress').width(parseInt(((a + c)/@successSub.pointsToWin)*100)+'%');
                      $('#count').attr('value', 0);
                      }
                     if(data1=="LOST") {
                      var b = parseInt($('#system').text());
                      $('#system').html(b + c);
-                     $('#opponent_progress').width(parseInt(((b + c)/@pointsToWin)*100)+'%');
+                     $('#opponent_progress').width(parseInt(((b + c)/@successSub.pointsToWin)*100)+'%');
                      $('#count').attr('value',0);
                     }
                     var a = parseInt($('#you').text());
@@ -144,17 +144,23 @@
                      $('#you_progress').addClass("progressBarRed");
                     }
 
-                    if(parseInt($('#you').text()) >=@pointsToWin || parseInt($('#system').text()) >=@pointsToWin){
+                    if(parseInt($('#you').text()) >=@successSub.pointsToWin || parseInt($('#system').text()) >=@successSub.pointsToWin){
                         $("#allOptions").hide();
                         $('#winner').show();
-                        var image = $('<img></img>').attr('src', parseInt($('#you').text()) >=@pointsToWin ? "http://www.placehold.it/500x60/DAF7A6/C70039&text=congratulations a winner is @player1Name !" : "http://www.placehold.it/500x60/DAF7A6/C70039&text=congratulations a winner is @player2Name !");
+                        var image = $('<img></img>').attr('src', parseInt($('#you').text()) >=@successSub.pointsToWin ? "http://www.placehold.it/500x60/DAF7A6/C70039&text=congratulations a winner is @successSub.player1Name !" : "http://www.placehold.it/500x60/DAF7A6/C70039&text=congratulations a winner is @successSub.player2Name !");
                         image.appendTo('#winner')
 
                     } else {
-
-                        setTimeout(function(){
-                        jsRoutes.controllers.HomeController.getPlayer1Move(parseInt($('#player1').text()), '@player1url.getOrElse("no")').ajax(ajax2)
-                        },10);
+                        if(@successSub.numberOfBots=="2") {
+                            setTimeout(function(){
+                            jsRoutes.controllers.HomeController.getPlayer1Move(parseInt($('#player1').text()), '@successSub.player1url.getOrElse("no")').ajax(ajax2)
+                            },10);
+                        }
+                        if(@successSub.numberOfBots=="1" && @successSub.mode.isDefined &&  "@successSub.mode.get"=='autoMove'){
+                         setTimeout(function(){
+                            jsRoutes.controllers.HomeController.getPlayer1Move(parseInt($('#player1').text()), "no").ajax(ajax2)
+                            },10);
+                        }
                     }
                 }
 
@@ -167,7 +173,7 @@
                     success: successPostFn,
                     error: errorFn,
                     contentType: "application/json",
-                    data: JSON.stringify({"player1" :  $('input[name=rps]:checked').val(), "player2" : data, "player1url":'@player1url.getOrElse("no")', "player2url":'@player2url.getOrElse("no")'})});
+                    data: JSON.stringify({"player1" :  $('input[name=rps]:checked').val(), "player2" : data, "player1url":'@successSub.player1url.getOrElse("no")', "player2url":'@successSub.player2url.getOrElse("no")'})});
          }
 
          function successDynamicFn(dynamicMove) {
@@ -199,14 +205,22 @@
             $(this).find('div').addClass('checked');
             $('input[type=radio].radio-image').attr('checked', false);
             $check.prop('checked', true);
-            jsRoutes.controllers.HomeController.getPlayer2Move(parseInt($('#player2').text()), '@player2url.getOrElse("no")').ajax(ajax1)
+            jsRoutes.controllers.HomeController.getPlayer2Move(parseInt($('#player2').text()), '@successSub.player2url.getOrElse("no")').ajax(ajax1)
 
          });
 
-         function callme(){
-            jsRoutes.controllers.HomeController.getPlayer1Move(parseInt($('#player1').text()), '@player1url.getOrElse("no")').ajax(ajax2)
+         if(@successSub.numberOfBots=="2") {
+             function dynamicMove(){
+                jsRoutes.controllers.HomeController.getPlayer1Move(parseInt($('#player1').text()), '@successSub.player1url.getOrElse("no")').ajax(ajax2)
+             }
+             dynamicMove();
          }
-         callme();
+         if(@successSub.numberOfBots=="1" && @successSub.mode.isDefined &&  "@successSub.mode.get"=='autoMove'){
+            function automaticMove(){
+                jsRoutes.controllers.HomeController.getPlayer1Move(parseInt($('#player1').text()), "no").ajax(ajax2)
+             }
+             automaticMove();
+         }
 
          });
 

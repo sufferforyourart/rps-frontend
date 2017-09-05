@@ -7,6 +7,8 @@ object RbsBotsForms {
 
   val RbsBotsorm = Form(
     mapping(
+      "numberOfBots" -> text,
+      "mode" -> optional(text),
       "player1Name" -> text(minLength = 2),
       "player2Name" -> text(minLength = 2),
       "pointsToWin" -> number,

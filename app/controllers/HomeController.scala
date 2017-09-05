@@ -50,14 +50,7 @@ class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: Messages
               },
               successSub => {
                 sendData(successSub)
-                Ok(views.html.rps_bots(
-                  successSub.player1Name,
-                  successSub.player2Name,
-                  successSub.pointsToWin,
-                  successSub.maxRounds,
-                  successSub.dynamiteCount,
-                  successSub.player1url,
-                  successSub.player2url))
+                Ok(views.html.rps_bots(successSub))
               }
     )
 
@@ -92,16 +85,10 @@ class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: Messages
           (response.json).as[String]
       }
       futureResult.map{ res =>
-        if(dynaCount<=0 && res == "DYNAMITE"){
-          Ok("WATERBOMB")
-        } else {
-          Ok(res)
-        }
+        Ok(replaceDynamite(dynaCount,res))
       }
     } else {
-      Future.successful(
-        Ok(if(dynaCount!=0) scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS", "DYNAMITE", "WATERBOMB")).head else scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS")).head)
-      )
+      Future.successful(Ok(replaceDynamite(dynaCount,getRandomMove())))
     }
 
   }
@@ -115,19 +102,23 @@ class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: Messages
           (response.json).as[String]
       }
       futureResult.map{ res =>
-        if(dynaCount<=0 && res == "DYNAMITE"){
-          Ok("WATERBOMB")
-        } else {
-          Ok(res)
-        }
+        Ok(replaceDynamite(dynaCount,res))
       }
     } else {
-      Future.successful(
-        Ok(if(dynaCount!=0) scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS", "DYNAMITE", "WATERBOMB")).head else scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS")).head)
-      )
+      Future.successful(Ok(replaceDynamite(dynaCount,getRandomMove())))
     }
   }
 
+  private def getRandomMove(): String ={
+    scala.util.Random.shuffle(List("ROCK", "PAPER", "SCISSORS", "DYNAMITE", "WATERBOMB")).head
+  }
+
+  private def replaceDynamite(dynaCount : Int,res: String): String ={
+    dynaCount<=0 && res == "DYNAMITE" match {
+      case true => "WATERBOMB"
+      case _ => res
+    }
+  }
 
   def lastOpponentMove = Action.async { implicit request =>
     Try(request.body.asJson) match {

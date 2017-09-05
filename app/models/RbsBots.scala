@@ -1,9 +1,15 @@
 package models
 import play.api.libs.json.Json
 
-case class RbsBots(player1Name: String,player2Name: String,
-                   pointsToWin: Int, maxRounds:Int, dynamiteCount:Int,
-                   player1url: Option[String], player2url: Option[String])
+case class RbsBots(numberOfBots:String,
+                   mode: Option[String],
+                   player1Name: String,
+                   player2Name: String,
+                   pointsToWin: Int,
+                   maxRounds:Int,
+                   dynamiteCount:Int,
+                   player1url: Option[String],
+                   player2url: Option[String])
 
 
 case class bot(opponentName: String, pointsToWin: Int, maxRounds:Int, dynamiteCount:Int)
