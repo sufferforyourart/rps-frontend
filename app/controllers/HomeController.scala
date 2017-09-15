@@ -61,14 +61,14 @@ class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: Messages
     if(person.player1url.isDefined && person.player2url.isDefined){
       val url1=s"${person.player1url.get}/start"
       val url2=s"${person.player2url.get}/start"
-      ws.url(url1).post(Json.toJson(bot(person.player1Name, person.pointsToWin, person.maxRounds, person.dynamiteCount))).flatMap { _ =>
-        ws.url(url2).post(Json.toJson(bot(person.player2Name, person.pointsToWin, person.maxRounds, person.dynamiteCount))).map {
+      ws.url(url1).post(Json.toJson(bot(person.player2Name, person.pointsToWin, person.maxRounds, person.dynamiteCount))).flatMap { _ =>
+        ws.url(url2).post(Json.toJson(bot(person.player1Name, person.pointsToWin, person.maxRounds, person.dynamiteCount))).map {
           response  => (response)
         }
       }
     } else{
       val url2=s"${person.player1url.getOrElse(person.player2url.get)}/start"
-      ws.url(url2).post(Json.toJson(bot(if(person.player1url.isDefined){person.player1Name} else {person.player2Name}, person.pointsToWin, person.maxRounds, person.dynamiteCount))).map {
+      ws.url(url2).post(Json.toJson(bot(if(person.player1url.isDefined){person.player2Name} else {person.player1Name}, person.pointsToWin, person.maxRounds, person.dynamiteCount))).map {
         response  => (response)
       }
     }
