@@ -42,16 +42,16 @@ class HomeController @Inject() (ws: WSClient)(implicit val messagesApi: Messages
     Ok(views.html.index(RbsBotsorm))
   }
 
-  def submit = Action { implicit request =>
+  def submit = Action.async { implicit request =>
 
     RbsBotsorm.bindFromRequest.fold(
-              formWithErrors => {
-                BadRequest(views.html.index(formWithErrors))
-              },
-              successSub => {
-                sendData(successSub)
-                Ok(views.html.rps_bots(successSub))
-              }
+      formWithErrors => {
+        Future.successful(BadRequest(views.html.index(formWithErrors)))
+      },
+      successSub => {
+        sendData(successSub)
+          .map{ _ => Ok(views.html.rps_bots(successSub)) }
+      }
     )
 
   }
